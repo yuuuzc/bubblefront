@@ -5,6 +5,11 @@
 
 零依赖：没有框架、没有打包器、没有二进制素材。原生 ES Modules + Canvas 2D + WebAudio。
 
+## 体验入口
+
+在线体验（Qoder Site，私有站点，需登录 Qoder 账号）：
+<https://bubblefront-x2vyvjto7sz.qoder.zone>
+
 ## 运行
 
 ```bash

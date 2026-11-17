@@ -6,26 +6,34 @@
 <title>泡泡前线 BubbleFront</title>
 <style>
   :root {
-    --bg: #0a0e1a; --panel: rgba(18,26,44,.82); --line: rgba(120,160,220,.18);
-    --text: #e8eefc; --dim: #8fa3c8; --accent: #7fe3ff; --warn: #ffb454;
-    --bad: #ff7a7a; --good: #8ff0a4;
+    --site-bg: #0a0e1a; --site-fg: #e8eefc; --site-accent: #7fe3ff; --site-on-accent: #061018;
+    --site-surface: rgba(18,26,44,.82); --site-muted: #8fa3c8; --site-border: rgba(120,160,220,.18);
+    --site-font: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --site-radius: 12px; --site-space: 1; --site-type: 1; --site-motion: 1;
+    --space: calc(16px * var(--site-space, 1));
+    --bg: var(--site-bg); --panel: var(--site-surface); --line: var(--site-border);
+    --text: var(--site-fg); --dim: var(--site-muted); --accent: var(--site-accent);
+    --warn: #ffb454; --bad: #ff7a7a; --good: #8ff0a4;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body {
     background: radial-gradient(1200px 700px at 20% -10%, #1b2a4a 0%, var(--bg) 60%) fixed;
     color: var(--text);
-    font: 14px/1.5 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    font: calc(14px * var(--site-type, 1))/1.5 var(--site-font);
     overflow-x: hidden;
   }
   button, select, input {
     font: inherit; color: var(--text);
     background: rgba(30,42,68,.9); border: 1px solid var(--line);
-    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+    border-radius: calc(var(--site-radius) * 0.66); padding: 6px 12px; cursor: pointer;
+    transition: border-color calc(180ms * var(--site-motion, 1)) ease,
+                background-color calc(180ms * var(--site-motion, 1)) ease,
+                filter calc(180ms * var(--site-motion, 1)) ease;
   }
   button:hover { border-color: var(--accent); background: rgba(44,62,96,.95); }
   button:disabled { opacity: .4; cursor: default; }
-  button.primary { background: linear-gradient(180deg, #2f9fd0, #1c6d9c); border-color: #56c8f5; font-weight: 700; }
+  button.primary { background: linear-gradient(180deg, color-mix(in srgb, var(--accent), #fff 18%), var(--accent)); border-color: var(--accent); color: var(--site-on-accent); font-weight: 700; }
   button.primary:hover { filter: brightness(1.12); }
   button.on { border-color: var(--accent); color: var(--accent); box-shadow: inset 0 0 12px rgba(127,227,255,.15); }
   header {
@@ -34,18 +42,18 @@
     background: rgba(10,14,26,.7); backdrop-filter: blur(8px);
     position: sticky; top: 0; z-index: 5;
   }
-  h1 { font-size: 19px; margin: 0; letter-spacing: 1px; }
+  h1 { font-size: calc(19px * var(--site-type, 1)); margin: 0; letter-spacing: 1px; }
   h1 small { color: var(--dim); font-size: 11px; letter-spacing: 2px; margin-left: 8px; }
   #toolbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   #toolbar .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
-  main { display: flex; gap: 16px; padding: 16px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  main { display: flex; gap: var(--space); padding: var(--space); align-items: flex-start; justify-content: center; flex-wrap: wrap; }
   #stage { position: relative; }
-  canvas { display: block; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.5), 0 0 0 1px var(--line); background: #1b2340; }
-  aside { width: 290px; display: flex; flex-direction: column; gap: 12px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  canvas { display: block; border-radius: var(--site-radius); box-shadow: 0 18px 50px rgba(0,0,0,.5), 0 0 0 1px var(--line); background: #1b2340; }
+  aside { width: 290px; display: flex; flex-direction: column; gap: var(--space); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--site-radius); padding: calc(12px * var(--site-space, 1)) calc(14px * var(--site-space, 1)); }
   .card h2 { margin: 0 0 8px; font-size: 12px; color: var(--dim); font-weight: 600; letter-spacing: 2px; }
   #timerRow { display: flex; justify-content: space-between; align-items: baseline; }
-  #timer { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+  #timer { font-size: calc(34px * var(--site-type, 1)); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
   #timer.low { color: var(--bad); }
   #seedLabel { color: var(--dim); font-size: 11px; }
   .teamRow { display: flex; justify-content: space-between; margin-top: 6px; font-size: 13px; }
@@ -58,7 +66,7 @@
   .pcard .status { font-size: 11px; color: var(--warn); }
   .pip { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 2px; background: currentColor; }
   #feed { max-height: 150px; overflow: hidden; display: flex; flex-direction: column; gap: 3px; font-size: 12px; }
-  #feed div { color: var(--dim); animation: fadein .25s ease; }
+  #feed div { color: var(--dim); animation: fadein calc(250ms * var(--site-motion, 1)) ease; }
   #feed div.hot { color: var(--warn); }
   @keyframes fadein { from { opacity: 0; transform: translateY(-4px); } }
   kbd {
@@ -68,11 +76,11 @@
   .keys { display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 12px; color: var(--dim); align-items: center; }
   .overlay {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    background: rgba(6,10,20,.82); backdrop-filter: blur(6px); border-radius: 12px; z-index: 4;
+    background: rgba(6,10,20,.82); backdrop-filter: blur(6px); border-radius: var(--site-radius); z-index: 4;
   }
   .overlay.hidden, .hidden { display: none !important; }
-  .modal { width: min(520px, 92%); background: rgba(16,23,40,.96); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: 0 24px 70px rgba(0,0,0,.6); }
-  .modal h2 { margin: 0 0 4px; font-size: 26px; }
+  .modal { width: min(520px, 92%); background: rgba(16,23,40,.96); border: 1px solid var(--line); border-radius: calc(var(--site-radius) * 1.33); padding: calc(24px * var(--site-space, 1)); box-shadow: 0 24px 70px rgba(0,0,0,.6); }
+  .modal h2 { margin: 0 0 4px; font-size: calc(26px * var(--site-type, 1)); }
   .modal .sub { color: var(--dim); margin-bottom: 18px; font-size: 13px; }
   .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
   .modes button { padding: 12px 6px; font-size: 13px; line-height: 1.4; }
@@ -93,6 +101,9 @@
   }
   #replayBadge { font-size: 11px; color: var(--warn); border: 1px solid var(--warn); padding: 2px 8px; border-radius: 20px; }
   footer { text-align: center; color: var(--dim); font-size: 11px; padding: 0 0 18px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
 </style>
 </head>
 <body>
