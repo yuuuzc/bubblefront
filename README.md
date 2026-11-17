@@ -7,7 +7,7 @@
 
 ## 体验入口
 
-在线体验（Qoder Site，私有站点，需登录 Qoder 账号）：
+在线体验（Qoder Site，公开访问，无需登录）：
 <https://bubblefront-x2vyvjto7sz.qoder.zone>
 
 ## 运行
