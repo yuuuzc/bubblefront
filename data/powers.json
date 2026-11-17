@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "elements": [
+    { "id": "normal", "name": "普通泡", "hue": 190, "blurb": "标准十字爆破，无任何副作用。" },
+    { "id": "fire",   "name": "焰泡",   "hue": 18,  "blurb": "烧穿第一块软砖后继续延伸，留下余烬。" },
+    { "id": "frost",  "name": "霜泡",   "hue": 205, "blurb": "留下霜面，踏入者速度减半。" },
+    { "id": "volt",   "name": "雷泡",   "hue": 52,  "blurb": "隔空引燃 2 格内的其他泡泡，远程连锁。" },
+    { "id": "gas",    "name": "毒泡",   "hue": 108, "blurb": "泄漏气域，任何爆破点燃气域都会二次蔓延。" }
+  ],
+  "combos": [
+    { "a": "fire",  "b": "gas",   "effect": "detonate", "name": "爆燃",   "blurb": "气域被点燃：3x3 火球，威力+1。" },
+    { "a": "volt",  "b": "gas",   "effect": "ignite",   "name": "引信",   "blurb": "全图毒气域瞬间起爆。" },
+    { "a": "frost", "b": "volt",  "effect": "conduct",  "name": "超导",   "blurb": "6 格内所有元素泡同时引爆。" },
+    { "a": "fire",  "b": "frost", "effect": "smoke",    "name": "灭焰",   "blurb": "蒸汽压制：清除并封锁区域内火焰。" },
+    { "a": "fire",  "b": "volt",  "effect": "flare",    "name": "曳光",   "blurb": "本次爆破臂长 +2。" },
+    { "a": "frost", "b": "gas",   "effect": "snare",    "name": "凝滞",   "blurb": "霜面与气域合并，减速时长翻倍。" }
+  ],
+  "powers": [
+    { "id": "bubble",  "name": "泡+1",   "hue": 320, "field": "bubbles",   "delta": 1,  "cap": 6,     "weight": 22, "blurb": "同时可放泡泡数 +1" },
+    { "id": "blast",   "name": "力+1",   "hue": 8,   "field": "blast",     "delta": 1,  "cap": 7,     "weight": 22, "blurb": "爆破臂长 +1" },
+    { "id": "speed",   "name": "速+1",   "hue": 140, "field": "speedU",    "delta": 1,  "cap": 5,     "weight": 16, "blurb": "移动速度 +1 档" },
+    { "id": "shield",  "name": "护盾",   "hue": 265, "field": "shield",    "delta": 1,  "cap": 2,     "weight": 10, "blurb": "抵挡一次爆炸判定" },
+    { "id": "quick",   "name": "速爆",   "hue": 48,  "field": "quickFuse", "set": 1,   "unique": true, "weight": 9, "blurb": "引信缩短 42%" },
+    { "id": "e_fire",  "name": "焰元素", "hue": 18,  "field": "element",   "set": "fire",  "weight": 8 },
+    { "id": "e_frost", "name": "霜元素", "hue": 205, "field": "element",   "set": "frost", "weight": 8 },
+    { "id": "e_volt",  "name": "雷元素", "hue": 52,  "field": "element",   "set": "volt",  "weight": 7 },
+    { "id": "e_gas",   "name": "毒元素", "hue": 108, "field": "element",   "set": "gas",   "weight": 6 },
+    { "id": "life",    "name": "命+1",   "hue": 0,   "field": "lives",     "delta": 1,  "cap": 5,    "weight": 2,  "rare": true, "blurb": "复活次数 +1" }
+  ]
+}

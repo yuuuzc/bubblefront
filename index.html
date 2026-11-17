@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>泡泡前线 BubbleFront</title>
+<style>
+  :root {
+    --bg: #0a0e1a; --panel: rgba(18,26,44,.82); --line: rgba(120,160,220,.18);
+    --text: #e8eefc; --dim: #8fa3c8; --accent: #7fe3ff; --warn: #ffb454;
+    --bad: #ff7a7a; --good: #8ff0a4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(1200px 700px at 20% -10%, #1b2a4a 0%, var(--bg) 60%) fixed;
+    color: var(--text);
+    font: 14px/1.5 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  button, select, input {
+    font: inherit; color: var(--text);
+    background: rgba(30,42,68,.9); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); background: rgba(44,62,96,.95); }
+  button:disabled { opacity: .4; cursor: default; }
+  button.primary { background: linear-gradient(180deg, #2f9fd0, #1c6d9c); border-color: #56c8f5; font-weight: 700; }
+  button.primary:hover { filter: brightness(1.12); }
+  button.on { border-color: var(--accent); color: var(--accent); box-shadow: inset 0 0 12px rgba(127,227,255,.15); }
+  header {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 18px; border-bottom: 1px solid var(--line);
+    background: rgba(10,14,26,.7); backdrop-filter: blur(8px);
+    position: sticky; top: 0; z-index: 5;
+  }
+  h1 { font-size: 19px; margin: 0; letter-spacing: 1px; }
+  h1 small { color: var(--dim); font-size: 11px; letter-spacing: 2px; margin-left: 8px; }
+  #toolbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  #toolbar .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+  main { display: flex; gap: 16px; padding: 16px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  #stage { position: relative; }
+  canvas { display: block; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.5), 0 0 0 1px var(--line); background: #1b2340; }
+  aside { width: 290px; display: flex; flex-direction: column; gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .card h2 { margin: 0 0 8px; font-size: 12px; color: var(--dim); font-weight: 600; letter-spacing: 2px; }
+  #timerRow { display: flex; justify-content: space-between; align-items: baseline; }
+  #timer { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+  #timer.low { color: var(--bad); }
+  #seedLabel { color: var(--dim); font-size: 11px; }
+  .teamRow { display: flex; justify-content: space-between; margin-top: 6px; font-size: 13px; }
+  .pcard { border-left: 3px solid var(--accent); padding: 7px 0 7px 10px; margin-bottom: 8px; }
+  .pcard:last-child { margin-bottom: 0; }
+  .pcard.dead { opacity: .45; }
+  .pcard .top { display: flex; justify-content: space-between; font-weight: 700; }
+  .pcard .stats { display: flex; gap: 10px; flex-wrap: wrap; color: var(--dim); font-size: 12px; margin-top: 3px; }
+  .pcard .stats b { color: var(--text); font-weight: 600; }
+  .pcard .status { font-size: 11px; color: var(--warn); }
+  .pip { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 2px; background: currentColor; }
+  #feed { max-height: 150px; overflow: hidden; display: flex; flex-direction: column; gap: 3px; font-size: 12px; }
+  #feed div { color: var(--dim); animation: fadein .25s ease; }
+  #feed div.hot { color: var(--warn); }
+  @keyframes fadein { from { opacity: 0; transform: translateY(-4px); } }
+  kbd {
+    background: #26314e; border: 1px solid #3c4a6e; border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 6px; font: 11px ui-monospace, monospace; color: var(--text);
+  }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 12px; color: var(--dim); align-items: center; }
+  .overlay {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(6,10,20,.82); backdrop-filter: blur(6px); border-radius: 12px; z-index: 4;
+  }
+  .overlay.hidden, .hidden { display: none !important; }
+  .modal { width: min(520px, 92%); background: rgba(16,23,40,.96); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: 0 24px 70px rgba(0,0,0,.6); }
+  .modal h2 { margin: 0 0 4px; font-size: 26px; }
+  .modal .sub { color: var(--dim); margin-bottom: 18px; font-size: 13px; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .modes button { padding: 12px 6px; font-size: 13px; line-height: 1.4; }
+  .modes button small { display: block; color: var(--dim); font-size: 11px; }
+  .modes button.sel { border-color: var(--accent); background: rgba(38,70,100,.9); }
+  .formRow { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; font-size: 13px; }
+  .formRow label { width: 76px; color: var(--dim); }
+  .formRow input { width: 150px; }
+  .modal .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  #endStats { font-size: 13px; color: var(--dim); max-height: 200px; overflow: auto; }
+  #endStats table { width: 100%; border-collapse: collapse; }
+  #endStats td, #endStats th { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+  #endStats td:first-child, #endStats th:first-child { text-align: left; }
+  #toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+    background: rgba(20,30,52,.95); border: 1px solid var(--accent); color: var(--text);
+    padding: 10px 20px; border-radius: 10px; z-index: 20; box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  }
+  #replayBadge { font-size: 11px; color: var(--warn); border: 1px solid var(--warn); padding: 2px 8px; border-radius: 20px; }
+  footer { text-align: center; color: var(--dim); font-size: 11px; padding: 0 0 18px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>泡泡前线<small>BUBBLEFRONT</small></h1>
+  <span id="replayBadge" class="hidden">回放中</span>
+  <div id="toolbar">
+    <button id="pauseBtn" title="P">暂停</button>
+    <button id="stepBtn" title="暂停时单步">单步</button>
+    <select id="speedSel" title="模拟速度">
+      <option value="0.25">0.25×</option><option value="0.5">0.5×</option>
+      <option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
+    </select>
+    <span class="sep"></span>
+    <button id="restartBtn" title="R — 同种子重开">重开</button>
+    <button id="newMapBtn" title="换一张随机地图">新地图</button>
+    <button id="menuBtn">主菜单</button>
+    <span class="sep"></span>
+    <button id="saveReplayBtn" title="导出本局回放">存回放</button>
+    <button id="watchReplayBtn" title="回放本局">看回放</button>
+    <span class="sep"></span>
+    <button id="previewBtn" class="on" title="H — 落点与爆炸范围预览">预览</button>
+    <button id="dangerBtn" title="G — 危险热力图">危险</button>
+    <button id="muteBtn" title="M">静音</button>
+    <button id="musicBtn" title="N">音乐</button>
+  </div>
+</header>
+
+<main>
+  <div id="stage">
+    <canvas id="game" width="836" height="572"></canvas>
+    <div id="menu" class="overlay">
+      <div class="modal">
+        <h2>泡泡前线</h2>
+        <div class="sub">五种元素泡泡 · 六种元素反应 · 被困 / 救援 / 冲刺 —— 不只是放泡泡。</div>
+        <div class="modes">
+          <button data-mode="solo" class="sel">单人 2v2<small>你 + AI 队友 对抗 2 AI</small></button>
+          <button data-mode="ffa">四人乱斗<small>你 + 3 AI 各自为战</small></button>
+          <button data-mode="local">本地双人<small>2 人 + 2 AI 同屏</small></button>
+        </div>
+        <div class="formRow"><label>AI 难度</label>
+          <select id="botLevel"><option value="easy">简单</option><option value="normal" selected>普通</option><option value="hard">困难</option></select>
+        </div>
+        <div class="formRow"><label>地图种子</label>
+          <input id="seed" type="number" min="1" step="1">
+          <button id="rollSeed">随机</button>
+        </div>
+        <div class="actions">
+          <button id="startBtn" class="primary">开始游戏</button>
+          <button id="loadReplayBtn">载入回放…</button>
+          <button id="lastReplayBtn" class="hidden">上次回放</button>
+          <input id="replayFile" type="file" accept=".json,application/json" class="hidden">
+        </div>
+        <div class="sub" style="margin:16px 0 0">
+          P1 <kbd>WASD</kbd> 移动 <kbd>空格</kbd> 放泡 <kbd>E</kbd> 换元素 ·
+          P2 <kbd>方向键</kbd> 移动 <kbd>回车</kbd> 放泡 <kbd>右Shift</kbd> 换元素<br>
+          <kbd>P</kbd> 暂停 <kbd>R</kbd> 重开 <kbd>H</kbd> 预览 <kbd>G</kbd> 危险图 <kbd>M</kbd> 静音
+        </div>
+      </div>
+    </div>
+    <div id="endOverlay" class="overlay hidden">
+      <div class="modal">
+        <h2 id="endTitle">胜利</h2>
+        <div class="sub" id="endSub"></div>
+        <div id="endStats"></div>
+        <div class="actions">
+          <button id="rematchBtn" class="primary">再来一局</button>
+          <button id="endNewBtn">新地图</button>
+          <button id="endWatchBtn">看回放</button>
+          <button id="endSaveBtn">存回放</button>
+          <button id="endMenuBtn">主菜单</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <div id="timerRow"><span id="timer">4:00</span><span id="seedLabel">seed —</span></div>
+      <div id="teamRows"></div>
+    </div>
+    <div class="card"><h2>玩家</h2><div id="playerCards"></div></div>
+    <div class="card"><h2>战况</h2><div id="feed"></div></div>
+    <div class="card"><h2>操作</h2>
+      <div class="keys">
+        <span><kbd>WASD</kbd></span><span>移动（贴墙自动滑角）</span>
+        <span><kbd>空格</kbd></span><span>在脚下放泡泡</span>
+        <span><kbd>E</kbd></span><span>切换元素：水/焰/霜/雷/气</span>
+        <span><kbd>P</kbd> <kbd>R</kbd></span><span>暂停 / 同种子重开</span>
+        <span><kbd>H</kbd> <kbd>G</kbd></span><span>爆炸预览 / 危险热力图</span>
+      </div>
+    </div>
+    <div class="card"><h2>元素反应</h2><div id="comboList" style="font-size:12px;color:var(--dim)"></div></div>
+  </aside>
+</main>
+<footer>零依赖 ES Modules · 固定 60Hz 确定性模拟 · 输入即回放 · 全部美术与音频程序化生成</footer>
+<div id="toast" class="hidden"></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

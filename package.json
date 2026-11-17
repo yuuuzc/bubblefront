@@ -1,0 +1,14 @@
+{
+  "name": "bubblefront",
+  "version": "0.1.0",
+  "private": true,
+  "description": "泡泡前线 / BubbleFront — deterministic bubble-battle arena (QQ唐-class), zero dependencies",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test",
+    "sim": "node tools/headless.js"
+  },
+  "engines": { "node": ">=18" }
+}
